@@ -1,3 +1,4 @@
+import 'package:filter_memo/ui/memo_timeline_page.dart';
 import 'package:filter_memo/ui/settting_feature_page.dart';
 import 'package:flutter/material.dart';
 
@@ -22,6 +23,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: SettingFeaturePage(),
+      routes: {
+        "/memo_timeline_page": (BuildContext context) => MemoTimelinePage(),
+      },
     );
   }
 }
