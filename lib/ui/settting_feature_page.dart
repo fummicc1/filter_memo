@@ -1,18 +1,16 @@
 import 'dart:async';
-
 import 'package:filter_memo/model/memo.dart';
 import 'package:filter_memo/network/local_storage_client.dart';
+import 'package:filter_memo/network/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingFeaturePage extends StatelessWidget {
-  BehaviorSubject<List<int>> _selectedIndexListController =
+  final BehaviorSubject<List<int>> _selectedIndexListController =
       BehaviorSubject.seeded([]);
-  Stream<List<int>> get _selectedIndexListStream =>
-      _selectedIndexListController.stream;
 
-  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClientMock();
+  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClient();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +19,7 @@ class SettingFeaturePage extends StatelessWidget {
         title: Text("Featureを設定"),
       ),
       body: StreamBuilder<List<int>>(
-          stream: _selectedIndexListStream,
+          stream: _selectedIndexListController.stream,
           builder: (context, snapshot) {
             return Padding(
               padding:

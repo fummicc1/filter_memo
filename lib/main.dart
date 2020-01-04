@@ -1,8 +1,10 @@
-import 'package:filter_memo/network/api_client.dart';
 import 'package:filter_memo/network/local_storage_client.dart';
+import 'package:filter_memo/ui/create_memo_page.dart';
 import 'package:filter_memo/ui/memo_timeline_page.dart';
 import 'package:filter_memo/ui/settting_feature_page.dart';
 import 'package:flutter/material.dart';
+
+import 'network/repository.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         "/memo_timeline_page": (BuildContext context) => MemoTimelinePage(),
+        "/create_memo_page": (BuildContext context) => CreateMemoPage(),
+        "/setting_feature_page": (BuildContext context) => SettingFeaturePage(),
       },
     );
   }

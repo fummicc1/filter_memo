@@ -1,14 +1,15 @@
-
 import 'package:filter_memo/model/memo.dart';
-
-mixin MemoRepository {
-  Future<List<Memo>> getMemos();
-}
+import 'package:filter_memo/network/repository.dart';
 
 class APIClient with MemoRepository {
 
   @override
   Future<List<Memo>> getMemos() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> saveMemo(Memo memo) {
     throw UnimplementedError();
   }
 }
@@ -40,4 +41,8 @@ class APIClientMock with MemoRepository {
     ]);
   }
 
+  @override
+  Future<bool> saveMemo(Memo memo) {
+    return Future.delayed(Duration(milliseconds: 1), () => true);
+  }
 }
