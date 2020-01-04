@@ -1,5 +1,5 @@
 import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/network/repository.dart';
+import 'package:filter_memo/repository/repository.dart';
 
 class APIClient with MemoRepository {
 

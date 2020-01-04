@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/network/local_storage_client.dart';
-import 'package:filter_memo/network/repository.dart';
+import 'package:filter_memo/repository/local_storage_client.dart';
+import 'package:filter_memo/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -22,47 +20,58 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
 
   MemoRepository _memoRepository = LocalStorageClient();
 
-  Memo _memo;
+  final BehaviorSubject<Memo> _memoSubject = BehaviorSubject();
+  final BehaviorSubject<List<String>> _myFeaturesSubject = BehaviorSubject();
 
-  final StreamController<DataPersistStatus> _dataPersistStatusStreamController =
-      StreamController<DataPersistStatus>();
+  final BehaviorSubject<DataPersistStatus> _dataPersistStatusSubject =
+      BehaviorSubject<DataPersistStatus>();
 
   @override
   void initState() {
     super.initState();
 
-    _userPreferencesRepository.getFeatures().then((features) {
-      if (features != null)
-        _memo.features = features;
-      else if (_memo == null)
-        _memo = Memo([], null, null);
-      else
-        _memo.features = [];
-    });
+    var features = _userPreferencesRepository.getFeatures().asStream();
+
+    _myFeaturesSubject.addStream(features);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _dataPersistStatusStreamController.close();
+    _dataPersistStatusSubject.close();
+    _memoSubject.close();
+    _myFeaturesSubject.close();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("メモを作成"),
-      ),
-      body: StreamBuilder<DataPersistStatus>(
-          stream: _dataPersistStatusStreamController.stream,
-          initialData: DataPersistStatus.Yet,
-          builder: (context, snapshot) {
-            return _bodyWidget(context, snapshot.data);
-          }),
-    );
+        appBar: AppBar(
+          title: Text("メモを作成"),
+        ),
+        body: StreamBuilder<List<String>>(
+          stream: _myFeaturesSubject.stream,
+          initialData: [],
+          builder: (context, myFeatureSnapshot) {
+            return StreamBuilder<Memo>(
+              stream: _memoSubject.stream,
+              initialData: Memo(null, null, null),
+              builder: (context, memoListSnapshot) {
+                return StreamBuilder<DataPersistStatus>(
+                    stream: _dataPersistStatusSubject.stream,
+                    initialData: DataPersistStatus.Yet,
+                    builder: (context, statusSnapshot) {
+                      return _bodyWidget(context, statusSnapshot.data,
+                          memoListSnapshot.data, myFeatureSnapshot.data);
+                    });
+              },
+            );
+          },
+        ));
   }
 
-  Widget _bodyWidget(BuildContext context, DataPersistStatus status) {
+  Widget _bodyWidget(BuildContext context, DataPersistStatus status, Memo memo,
+      List<String> myFeatures) {
     return ListView(
       padding: EdgeInsets.all(16),
       children: <Widget>[
@@ -74,7 +83,8 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
             ),
           ),
           onChanged: (text) {
-            if (_memo == null) _memo = Memo(null, null, text);
+            memo.content = text;
+            _memoSubject.add(memo);
           },
         ),
         status == DataPersistStatus.Yet
@@ -88,20 +98,21 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                 ),
                 onPressed: () {
-                  if (_memo.content != null &&
-                      _memo.content.isNotEmpty &&
-                      _memo.features != null &&
-                      _memo.features.isNotEmpty) {
-                    _memo.postDate = DateTime.now();
-                    _memoRepository.saveMemo(_memo).then((result) {
-                      if (result) Navigator.of(context).pop();
+                  if (memo.content != null && memo.content.isNotEmpty) {
+                    memo.features = myFeatures;
+                    memo.postDate = DateTime.now();
+                    _memoRepository.saveMemo(memo).then((result) {
+                      if (result)
+                        Navigator.of(context).pop();
+                      else
+                        _dataPersistStatusSubject.add(DataPersistStatus.Fail);
                     });
                   }
                 },
               )
             : status == DataPersistStatus.Saving
                 ? CircularProgressIndicator()
-                : status == DataPersistStatus.Yet ? Container() : null
+                : status == DataPersistStatus.Fail ? Container() : null
       ],
     );
   }

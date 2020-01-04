@@ -1,7 +1,7 @@
 import '../model/memo.dart';
 
 mixin UserPreferencesRepository {
-  Future<bool> saveFeatures();
+  Future<bool> saveFeatures(List<String> features);
   Future<bool> checkIsSetupFeatures();
   Future<List<String>> getFeatures();
 }

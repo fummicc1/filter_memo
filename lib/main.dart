@@ -1,10 +1,12 @@
-import 'package:filter_memo/network/local_storage_client.dart';
+import 'package:filter_memo/bloc/memo_timeline_bloc.dart';
+import 'package:filter_memo/bloc/setting_feature_bloc.dart';
+import 'package:filter_memo/repository/local_storage_client.dart';
+import 'package:filter_memo/repository/repository.dart';
 import 'package:filter_memo/ui/create_memo_page.dart';
 import 'package:filter_memo/ui/memo_timeline_page.dart';
 import 'package:filter_memo/ui/settting_feature_page.dart';
 import 'package:flutter/material.dart';
-
-import 'network/repository.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,15 +20,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: FutureBuilder<bool>(
@@ -34,14 +27,30 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
 
-          if (snapshot.data) return MemoTimelinePage();
-          else return SettingFeaturePage();
+          if (snapshot.data) return Provider<MemoTimelineBloc>(
+            create: (_) => MemoTimelineBloc(),
+            dispose: (_, bloc) => bloc.dispose,
+            child: MemoTimelinePage(),
+          );
+          else return Provider<SettingFeatureBloc>(
+            create: (_) => SettingFeatureBloc(),
+            dispose: (_, bloc) => bloc.dispose,
+            child: SettingFeaturePage(),
+          );
         },
       ),
       routes: {
-        "/memo_timeline_page": (BuildContext context) => MemoTimelinePage(),
+        "/memo_timeline_page": (BuildContext context) => Provider<MemoTimelineBloc>(
+          create: (_) => MemoTimelineBloc(),
+          dispose: (_, bloc) => bloc.dispose,
+          child: MemoTimelinePage(),
+        ),
         "/create_memo_page": (BuildContext context) => CreateMemoPage(),
-        "/setting_feature_page": (BuildContext context) => SettingFeaturePage(),
+        "/setting_feature_page": (BuildContext context) => Provider<SettingFeatureBloc>(
+          create: (_) => SettingFeatureBloc(),
+          dispose: (_, bloc) => bloc.dispose,
+          child: SettingFeaturePage(),
+        ),
       },
     );
   }

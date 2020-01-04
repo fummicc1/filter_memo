@@ -1,26 +1,41 @@
-import 'dart:async';
+import 'package:filter_memo/bloc/setting_feature_bloc.dart';
 import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/network/local_storage_client.dart';
-import 'package:filter_memo/network/repository.dart';
+import 'package:filter_memo/repository/local_storage_client.dart';
+import 'package:filter_memo/repository/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingFeaturePage extends StatelessWidget {
-  final BehaviorSubject<List<int>> _selectedIndexListController =
-      BehaviorSubject.seeded([]);
-
-  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClient();
-
   @override
   Widget build(BuildContext context) {
+    var myBloc = Provider.of<SettingFeatureBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Featureを設定"),
       ),
       body: StreamBuilder<List<int>>(
-          stream: _selectedIndexListController.stream,
+          stream: myBloc.selectedIndexListStream,
+          initialData: [],
           builder: (context, snapshot) {
+
+            if (snapshot.hasData && snapshot.data.isNotEmpty && snapshot.data.length == 3) {
+              return Center(
+                child: FlatButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed("/memo_timeline_page");
+                    },
+                    icon: Icon(Icons.done),
+                    label: Text(
+                      "設定完了！",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    )),
+              );
+            }
+
             return Padding(
               padding:
                   const EdgeInsets.only(top: 40, bottom: 40, left: 8, right: 8),
@@ -29,14 +44,15 @@ class SettingFeaturePage extends StatelessWidget {
                   crossAxisSpacing: 40,
                   mainAxisSpacing: 16,
                   crossAxisCount: 4,
-                  children: _createGridViewContent(context, snapshot.data)),
+                  children:
+                      _createGridViewContent(context, snapshot.data, myBloc)),
             );
           }),
     );
   }
 
   List<Container> _createGridViewContent(
-      BuildContext context, List<int> selectedList) {
+      BuildContext context, List<int> selectedList, SettingFeatureBloc myBloc) {
     return featureList.map((feature) {
       return Container(
         decoration: BoxDecoration(
@@ -52,22 +68,7 @@ class SettingFeaturePage extends StatelessWidget {
           child: Text(feature),
           onPressed: () {
             final int index = featureList.indexOf(feature);
-            final currentValue = _selectedIndexListController.value;
-
-            if (currentValue.contains(index))
-              currentValue.remove(index);
-            else
-              currentValue.add(index);
-
-            _selectedIndexListController
-                .add(_selectedIndexListController.value);
-
-            if (currentValue.length == 3) {
-              _userPreferencesRepository.saveFeatures().then((result) {
-                if (result)
-                  Navigator.of(context).pushNamed("/memo_timeline_page");
-              });
-            }
+            myBloc.currentlySelectedIndexSink.add(index);
           },
         )),
       );
