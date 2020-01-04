@@ -1,3 +1,4 @@
+import 'package:filter_memo/bloc/app_bloc.dart';
 import 'package:filter_memo/bloc/memo_timeline_bloc.dart';
 import 'package:filter_memo/bloc/setting_feature_bloc.dart';
 import 'package:filter_memo/repository/local_storage_client.dart';
@@ -8,7 +9,13 @@ import 'package:filter_memo/ui/settting_feature_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  Provider<AppBloc>(
+    create: (_) => AppBloc(),
+    dispose: (_, bloc) => bloc.dispose(),
+    child: MyApp(),
+  )
+);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -17,41 +24,44 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: FutureBuilder<bool>(
-        future: _userPreferencesRepository.checkIsSetupFeatures(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
 
-          if (snapshot.data) return Provider<MemoTimelineBloc>(
-            create: (_) => MemoTimelineBloc(),
+    var appBloc = Provider.of<AppBloc>(context);
+
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: FutureBuilder<bool>(
+          future: _userPreferencesRepository.checkIsSetupFeatures(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
+
+            if (snapshot.data) return Provider<MemoTimelineBloc>(
+              create: (_) => appBloc.getNewMemoTimelineBloc(),
+              dispose: (_, bloc) => bloc.dispose,
+              child: MemoTimelinePage(),
+            );
+            else return Provider<SettingFeatureBloc>(
+              create: (_) => appBloc.getNewSettingFeatureBloc(),
+              dispose: (_, bloc) => bloc.dispose,
+              child: SettingFeaturePage(),
+            );
+          },
+        ),
+        routes: {
+          "/memo_timeline_page": (BuildContext context) => Provider<MemoTimelineBloc>(
+            create: (_) => appBloc.getNewMemoTimelineBloc(),
             dispose: (_, bloc) => bloc.dispose,
             child: MemoTimelinePage(),
-          );
-          else return Provider<SettingFeatureBloc>(
-            create: (_) => SettingFeatureBloc(),
+          ),
+          "/create_memo_page": (BuildContext context) => CreateMemoPage(),
+          "/setting_feature_page": (BuildContext context) => Provider<SettingFeatureBloc>(
+            create: (_) => appBloc.getNewSettingFeatureBloc(),
             dispose: (_, bloc) => bloc.dispose,
             child: SettingFeaturePage(),
-          );
+          ),
         },
-      ),
-      routes: {
-        "/memo_timeline_page": (BuildContext context) => Provider<MemoTimelineBloc>(
-          create: (_) => MemoTimelineBloc(),
-          dispose: (_, bloc) => bloc.dispose,
-          child: MemoTimelinePage(),
-        ),
-        "/create_memo_page": (BuildContext context) => CreateMemoPage(),
-        "/setting_feature_page": (BuildContext context) => Provider<SettingFeatureBloc>(
-          create: (_) => SettingFeatureBloc(),
-          dispose: (_, bloc) => bloc.dispose,
-          child: SettingFeaturePage(),
-        ),
-      },
     );
   }
 }

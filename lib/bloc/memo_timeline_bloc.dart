@@ -14,6 +14,9 @@ class MemoTimelineBloc {
   final BehaviorSubject<List<Memo>> _displayMemosSubject = BehaviorSubject();
   Stream<List<Memo>> get displayMemosStream => _displayMemosSubject.stream;
 
+  final BehaviorSubject<void> _updateMemoContensSubject = BehaviorSubject();
+  Sink<void> get updateMemoContensSink => _updateMemoContensSubject.sink;
+
   MemoTimelineBloc() {
 
      var myFeatures = _userPreferencesRepository.getFeatures().asStream();
@@ -24,7 +27,7 @@ class MemoTimelineBloc {
 
        List<Memo> filterMemos = [];
 
-       var displayMemos = _displayMemosSubject.value;
+       final displayMemos = _displayMemosSubject.value;
        var number = 0;
 
        for (int i = 0; i < displayMemos.length; i++) {
@@ -47,7 +50,12 @@ class MemoTimelineBloc {
        _displayMemosSubject.add(filterMemos);
      });
 
-     var displayMemos = _memoRepository.getMemos().asStream();
+     _updateMemoContensSubject.stream.listen((_) {
+       final displayMemos = _memoRepository.getMemos().asStream();
+       _displayMemosSubject.addStream(displayMemos);
+     });
+
+     final displayMemos = _memoRepository.getMemos().asStream();
      _displayMemosSubject.addStream(displayMemos);
   }
 

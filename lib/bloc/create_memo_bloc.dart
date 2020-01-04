@@ -1,46 +1,55 @@
 import 'package:filter_memo/model/memo.dart';
 import 'package:filter_memo/repository/local_storage_client.dart';
 import 'package:filter_memo/repository/repository.dart';
+import 'package:filter_memo/ui/create_memo_page.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CreateMemoBloc {
+  final MemoRepository _memoRepository = LocalStorageClient();
+  final UserPreferencesRepository _userPreferencesRepository =
+      LocalStorageClient();
 
-  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClient();
+  final BehaviorSubject<String> _inputtedTextSubject = BehaviorSubject();
+  Sink<String> get inputtedTextSink => _inputtedTextSubject.sink;
 
-  final BehaviorSubject<List<int>> _selectedIndexListSubject = BehaviorSubject.seeded([]);
-  Stream<List<int>> get selectedIndexListStream => _selectedIndexListSubject.stream;
+  final BehaviorSubject<DataPersistStatus> _dataPersistStatusSubject =
+      BehaviorSubject();
+  Stream<DataPersistStatus> get dataPersistStatusStream =>
+      _dataPersistStatusSubject.stream;
 
-  final BehaviorSubject<int> _currentlySelectedIndexSubject = BehaviorSubject();
-  Sink<int> get currentlySelectedIndexSink => _currentlySelectedIndexSubject.sink;
+  final BehaviorSubject<void> _tappedSaveButtonSubject = BehaviorSubject();
+  Sink<void> get tappedSaveButtonSink => _tappedSaveButtonSubject.sink;
 
-  SettingFeatureBloc() {
+  Memo _memo = Memo(null, null, null);
 
-    _currentlySelectedIndexSubject.stream.listen((index) {
-
-      final List<int> indexList = _selectedIndexListSubject.value;
-      List<int> newList = [];
-
-      if (indexList.contains(index)) {
-        indexList.remove(index);
-      } else {
-        indexList.add(index);
-      }
-
-      _selectedIndexListSubject.add(indexList);
+  CreateMemoBloc() {
+    _userPreferencesRepository.getFeatures().then((features) {
+      this._memo.features = features;
     });
 
-    _selectedIndexListSubject.stream.listen((list) {
-      if (list.length == 3) {
-        var features = list.map((i) => featureList[i]);
-        _userPreferencesRepository.saveFeatures(features);
-      }
+    _inputtedTextSubject.stream.listen((text) {
+      this._memo.content = text;
+
+      if (text.isNotEmpty)
+        _dataPersistStatusSubject.add(DataPersistStatus.Ready);
     });
 
+    _tappedSaveButtonSubject.stream.listen((_) {
+      _memo.postDate = DateTime.now();
+      _dataPersistStatusSubject.add(DataPersistStatus.Saving);
+
+      _memoRepository.saveMemo(_memo).then((isSuccess) {
+        if (isSuccess)
+          _dataPersistStatusSubject.add(DataPersistStatus.Succeed);
+        else
+          _dataPersistStatusSubject.add(DataPersistStatus.Fail);
+      });
+    });
   }
 
   void dispose() {
-    _selectedIndexListSubject.close();
-    _currentlySelectedIndexSubject.close();
+    _inputtedTextSubject.close();
+    _dataPersistStatusSubject.close();
+    _tappedSaveButtonSubject.close();
   }
-
 }
