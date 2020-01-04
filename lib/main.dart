@@ -1,3 +1,5 @@
+import 'package:filter_memo/network/api_client.dart';
+import 'package:filter_memo/network/local_storage_client.dart';
 import 'package:filter_memo/ui/memo_timeline_page.dart';
 import 'package:filter_memo/ui/settting_feature_page.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,9 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+  UserPreferencesRepository _userPreferencesRepository = LocalStorageClientMock();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,7 +27,15 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: SettingFeaturePage(),
+      home: FutureBuilder<bool>(
+        future: _userPreferencesRepository.checkIsSetupFeatures(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
+
+          if (snapshot.data) return MemoTimelinePage();
+          else return SettingFeaturePage();
+        },
+      ),
       routes: {
         "/memo_timeline_page": (BuildContext context) => MemoTimelinePage(),
       },

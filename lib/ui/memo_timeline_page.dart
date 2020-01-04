@@ -1,11 +1,12 @@
 import 'package:filter_memo/model/memo.dart';
+import 'package:filter_memo/network/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MemoTimelinePage extends StatelessWidget {
 
-  final BehaviorSubject<List<Memo>> _memoListSubject = BehaviorSubject.seeded([]);
-  Stream<List<Memo>> get memoListStream => _memoListSubject.stream;
+  final MemoRepository _memoRepository = APIClientMock();
+  Future<List<Memo>> get memosFuture =>_memoRepository.getMemos();
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +14,15 @@ class MemoTimelinePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("タイムライン"),
       ),
-      body: StreamBuilder<List<Memo>>(
-        stream: memoListStream,
+      body: FutureBuilder<List<Memo>>(
+        future: memosFuture,
         builder: (context, snapShot) {
           return ListView.builder(itemCount: snapShot.data.length, itemBuilder: (context, index) {
-            Text("a");
+            final memo = snapShot.data[index];
+            return ListTile(
+              title: Text(memo.content),
+              subtitle: Text(memo.postDate.toString()),
+            );
           });
         },
       ),

@@ -1,29 +1,18 @@
 import 'dart:async';
 
+import 'package:filter_memo/model/memo.dart';
+import 'package:filter_memo/network/local_storage_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingFeaturePage extends StatelessWidget {
-  static const List<String> featureList = [
-    "大学生",
-    "男性",
-    "女性",
-    "メガネ",
-    "プログラミング",
-    "野球",
-    "サッカー",
-    "テニス",
-    "卓球",
-    "バドミントン",
-    "バスケットボール",
-    "水泳"
-  ];
-
   BehaviorSubject<List<int>> _selectedIndexListController =
       BehaviorSubject.seeded([]);
   Stream<List<int>> get _selectedIndexListStream =>
       _selectedIndexListController.stream;
+
+  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClientMock();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +37,8 @@ class SettingFeaturePage extends StatelessWidget {
     );
   }
 
-  List<Container> _createGridViewContent(BuildContext context, List<int> selectedList) {
+  List<Container> _createGridViewContent(
+      BuildContext context, List<int> selectedList) {
     return featureList.map((feature) {
       return Container(
         decoration: BoxDecoration(
@@ -75,7 +65,10 @@ class SettingFeaturePage extends StatelessWidget {
                 .add(_selectedIndexListController.value);
 
             if (currentValue.length == 3) {
-              Navigator.of(context).pushNamed("/memo_timeline_page");
+              _userPreferencesRepository.saveFeatures().then((result) {
+                if (result)
+                  Navigator.of(context).pushNamed("/memo_timeline_page");
+              });
             }
           },
         )),
