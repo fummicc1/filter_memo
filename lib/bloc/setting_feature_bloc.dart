@@ -34,7 +34,7 @@ class SettingFeatureBloc {
         List<String> features = [];
 
         for (int i = 0; i < 3; i++) {
-          features.add(featureList[i]);
+          features.add(featureList[list[i]]);
         }
         _userPreferencesRepository.saveFeatures(features);
       }

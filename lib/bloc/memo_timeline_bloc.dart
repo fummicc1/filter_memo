@@ -17,6 +17,9 @@ class MemoTimelineBloc {
   final BehaviorSubject<void> _updateMemoContensSubject = BehaviorSubject();
   Sink<void> get updateMemoContensSink => _updateMemoContensSubject.sink;
 
+  final BehaviorSubject<void> _updateMyFeatureSubject = BehaviorSubject();
+  Sink<void> get updateMyFeatureSink => _updateMyFeatureSubject.sink;
+
   MemoTimelineBloc() {
 
      var myFeatures = _userPreferencesRepository.getFeatures().asStream();
@@ -58,6 +61,12 @@ class MemoTimelineBloc {
 
      final displayMemos = _memoRepository.getMemos().asStream();
      _displayMemosSubject.addStream(displayMemos);
+
+     _updateMyFeatureSubject.stream.listen((_) {
+       _userPreferencesRepository.getFeatures().then((features) {
+         _myFeaturesSubject.add(features);
+       });
+     });
   }
 
   void dispose() {
