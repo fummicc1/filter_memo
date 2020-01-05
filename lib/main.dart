@@ -1,4 +1,5 @@
 import 'package:filter_memo/bloc/app_bloc.dart';
+import 'package:filter_memo/bloc/create_memo_bloc.dart';
 import 'package:filter_memo/bloc/memo_timeline_bloc.dart';
 import 'package:filter_memo/bloc/setting_feature_bloc.dart';
 import 'package:filter_memo/repository/local_storage_client.dart';
@@ -38,12 +39,12 @@ class MyApp extends StatelessWidget {
             if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
 
             if (snapshot.data) return Provider<MemoTimelineBloc>(
-              create: (_) => appBloc.getNewMemoTimelineBloc(),
+              create: (_) => appBloc.memoTimelineBloc == null ? appBloc.getNewMemoTimelineBloc() : appBloc.memoTimelineBloc,
               dispose: (_, bloc) => bloc.dispose,
               child: MemoTimelinePage(),
             );
             else return Provider<SettingFeatureBloc>(
-              create: (_) => appBloc.getNewSettingFeatureBloc(),
+              create: (_) => appBloc.settingFeatureBloc == null ? appBloc.getNewSettingFeatureBloc() : appBloc.settingFeatureBloc,
               dispose: (_, bloc) => bloc.dispose,
               child: SettingFeaturePage(),
             );
@@ -51,13 +52,17 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           "/memo_timeline_page": (BuildContext context) => Provider<MemoTimelineBloc>(
-            create: (_) => appBloc.getNewMemoTimelineBloc(),
+            create: (_) => appBloc.memoTimelineBloc == null ? appBloc.getNewMemoTimelineBloc() : appBloc.memoTimelineBloc,
             dispose: (_, bloc) => bloc.dispose,
             child: MemoTimelinePage(),
           ),
-          "/create_memo_page": (BuildContext context) => CreateMemoPage(),
+          "/create_memo_page": (BuildContext context) => Provider<CreateMemoBloc>(
+            create: (_) => appBloc.createMemoBloc == null ? appBloc.getNewCreateMemoBloc() : appBloc.createMemoBloc,
+            dispose: (_, bloc) => bloc.dispose(),
+            child: CreateMemoPage(),
+          ),
           "/setting_feature_page": (BuildContext context) => Provider<SettingFeatureBloc>(
-            create: (_) => appBloc.getNewSettingFeatureBloc(),
+            create: (_) => appBloc.settingFeatureBloc == null ? appBloc.getNewSettingFeatureBloc() : appBloc.settingFeatureBloc,
             dispose: (_, bloc) => bloc.dispose,
             child: SettingFeaturePage(),
           ),

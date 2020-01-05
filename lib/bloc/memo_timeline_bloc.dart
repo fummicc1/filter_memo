@@ -53,6 +53,7 @@ class MemoTimelineBloc {
      _updateMemoContensSubject.stream.listen((_) {
        final displayMemos = _memoRepository.getMemos().asStream();
        _displayMemosSubject.addStream(displayMemos);
+       print(_displayMemosSubject.value);
      });
 
      final displayMemos = _memoRepository.getMemos().asStream();

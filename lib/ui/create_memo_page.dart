@@ -44,6 +44,9 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
     return ListView(
       padding: EdgeInsets.all(16),
       children: <Widget>[
+        status == DataPersistStatus.Yet
+            ? Center(child: Text("メモを入力してみましょう！"))
+            : Container(),
         TextField(
           style: TextStyle(fontSize: 20),
           decoration: InputDecoration(
@@ -74,16 +77,28 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
                 : status == DataPersistStatus.Fail
                     ? Container()
                     : status == DataPersistStatus.Succeed
-                        ? Center(
-                            child: FlatButton.icon(
-                                onPressed: () {
-                                  appBloc.memoTimelineBloc.updateMemoContensSink.add(null);
-                                  Navigator.of(context).pop();
-                                },
-                                icon: Icon(Icons.done),
-                                label: Text("メモの保存が完了しました！")),
+                        ? Container(
+                            width: 120,
+                            height: 64,
+                            padding: EdgeInsets.all(24),
+                            child: RaisedButton.icon(
+                              onPressed: () {
+                                appBloc.memoTimelineBloc.updateMemoContensSink
+                                    .add(0);
+                                Navigator.of(context).pop();
+                              },
+                              label: Text(
+                                "完了！",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 32),
+                              ),
+                              icon: Icon(
+                                Icons.done,
+                                size: 40,
+                              ),
+                            ),
                           )
-                        : status == DataPersistStatus.Yet ? CircularProgressIndicator() : null,
+                        : Container(),
       ],
     );
   }
