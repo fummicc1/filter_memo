@@ -85,8 +85,6 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               onPressed: () {
-                                appBloc.memoTimelineBloc.updateMemoContensSink
-                                    .add(0);
                                 Navigator.of(context).pop();
                               },
                               label: Text(
