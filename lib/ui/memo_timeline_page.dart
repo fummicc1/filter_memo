@@ -14,6 +14,8 @@ class _MemoTimelinePageState extends State<MemoTimelinePage> {
   Widget build(BuildContext context) {
     var myBloc = Provider.of<MemoTimelineBloc>(context);
 
+    myBloc.updateMemoContensSink.add(0);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("タイムライン"),
