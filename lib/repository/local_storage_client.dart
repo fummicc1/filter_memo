@@ -44,19 +44,19 @@ class LocalStorageClient with UserPreferencesRepository, MemoRepository {
     final shared = await SharedPreferences.getInstance();
 
     final keys = shared.getKeys();
-    if (keys.contains("private_memo_list")) {
+    if (!keys.contains("private_memo_list")) {
       return Future.value([]);
     }
 
     final memosJsonData = shared.get("private_memo_list");
     if (memosJsonData == null) return Future.value([]);
 
-    final List<dynamic> memosMap = json.decode(memosJsonData)["values"] as List<dynamic>;;
+    final List<dynamic> memosMap = json.decode(memosJsonData)["values"] as List<dynamic>;
 
     List<Memo> memos = [];
 
     for (int i = 0; i < memosMap.length; i++) {
-      final Memo memo = Memo.fromJson(memos[i] as Map<String, dynamic>);
+      final Memo memo = Memo.fromJson(memosMap[i] as Map<String, dynamic>);
       memos.add(memo);
     }
 

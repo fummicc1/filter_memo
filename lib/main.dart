@@ -21,7 +21,7 @@ void main() => runApp(
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
-  UserPreferencesRepository _userPreferencesRepository = LocalStorageClientMock();
+  final UserPreferencesRepository _userPreferencesRepository = LocalStorageClientMock();
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +39,12 @@ class MyApp extends StatelessWidget {
             if (!snapshot.hasData) return Scaffold(body: CircularProgressIndicator());
 
             if (snapshot.data) return Provider<MemoTimelineBloc>(
-              create: (_) => appBloc.memoTimelineBloc == null ? appBloc.getNewMemoTimelineBloc() : appBloc.memoTimelineBloc,
+              create: (_) => appBloc.getNewMemoTimelineBloc(),
               dispose: (_, bloc) => bloc.dispose,
               child: MemoTimelinePage(),
             );
             else return Provider<SettingFeatureBloc>(
-              create: (_) => appBloc.settingFeatureBloc == null ? appBloc.getNewSettingFeatureBloc() : appBloc.settingFeatureBloc,
+              create: (_) => appBloc.getNewSettingFeatureBloc(),
               dispose: (_, bloc) => bloc.dispose,
               child: SettingFeaturePage(),
             );
@@ -52,17 +52,17 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           "/memo_timeline_page": (BuildContext context) => Provider<MemoTimelineBloc>(
-            create: (_) => appBloc.memoTimelineBloc == null ? appBloc.getNewMemoTimelineBloc() : appBloc.memoTimelineBloc,
+            create: (_) => appBloc.getNewMemoTimelineBloc(),
             dispose: (_, bloc) => bloc.dispose,
             child: MemoTimelinePage(),
           ),
           "/create_memo_page": (BuildContext context) => Provider<CreateMemoBloc>(
-            create: (_) => appBloc.createMemoBloc == null ? appBloc.getNewCreateMemoBloc() : appBloc.createMemoBloc,
-            dispose: (_, bloc) => bloc.dispose(),
+            create: (_) => appBloc.getNewCreateMemoBloc(),
+            dispose: (_, __) => appBloc.disposeCreateMemoBloc(),
             child: CreateMemoPage(),
           ),
           "/setting_feature_page": (BuildContext context) => Provider<SettingFeatureBloc>(
-            create: (_) => appBloc.settingFeatureBloc == null ? appBloc.getNewSettingFeatureBloc() : appBloc.settingFeatureBloc,
+            create: (_) => appBloc.getNewSettingFeatureBloc(),
             dispose: (_, bloc) => bloc.dispose,
             child: SettingFeaturePage(),
           ),

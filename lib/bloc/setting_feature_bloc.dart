@@ -18,7 +18,6 @@ class SettingFeatureBloc {
     _currentlySelectedIndexSubject.stream.listen((index) {
 
       final List<int> indexList = _selectedIndexListSubject.value;
-      List<int> newList = [];
 
       if (indexList.contains(index)) {
         indexList.remove(index);
@@ -31,7 +30,12 @@ class SettingFeatureBloc {
 
     _selectedIndexListSubject.stream.listen((list) {
       if (list.length == 3) {
-        var features = list.map((i) => featureList[i]);
+
+        List<String> features = [];
+
+        for (int i = 0; i < 3; i++) {
+          features.add(featureList[i]);
+        }
         _userPreferencesRepository.saveFeatures(features);
       }
     });

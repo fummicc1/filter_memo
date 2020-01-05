@@ -1,7 +1,5 @@
 import 'package:filter_memo/bloc/memo_timeline_bloc.dart';
 import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/repository/local_storage_client.dart';
-import 'package:filter_memo/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -79,7 +77,7 @@ class _MemoTimelinePageState extends State<MemoTimelinePage> {
                       final memo = memosSnapshot.data[index];
                       return ListTile(
                         title: Text(memo.content),
-                        subtitle: Text(memo.postDate.toString()),
+                        subtitle: Text(memo.postDateFormatted),
                       );
                     });
               },

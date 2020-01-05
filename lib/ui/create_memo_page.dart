@@ -1,11 +1,7 @@
 import 'package:filter_memo/bloc/app_bloc.dart';
 import 'package:filter_memo/bloc/create_memo_bloc.dart';
-import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/repository/local_storage_client.dart';
-import 'package:filter_memo/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 enum DataPersistStatus {
   Yet,
@@ -58,6 +54,9 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
             bloc.inputtedTextSink.add(text);
           },
         ),
+        SizedBox.fromSize(
+          size: Size.fromHeight(40),
+        ),
         status == DataPersistStatus.Ready
             ? FlatButton.icon(
                 icon: Icon(
@@ -78,10 +77,13 @@ class _CreateMemoPageState extends State<CreateMemoPage> {
                     ? Container()
                     : status == DataPersistStatus.Succeed
                         ? Container(
-                            width: 120,
                             height: 64,
-                            padding: EdgeInsets.all(24),
+                            width: 96,
+                            margin: EdgeInsets.all(32),
                             child: RaisedButton.icon(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
                               onPressed: () {
                                 appBloc.memoTimelineBloc.updateMemoContensSink
                                     .add(0);

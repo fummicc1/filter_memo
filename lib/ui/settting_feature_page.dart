@@ -1,11 +1,8 @@
 import 'package:filter_memo/bloc/setting_feature_bloc.dart';
 import 'package:filter_memo/model/memo.dart';
-import 'package:filter_memo/repository/local_storage_client.dart';
-import 'package:filter_memo/repository/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 class SettingFeaturePage extends StatelessWidget {
   @override

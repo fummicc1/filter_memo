@@ -51,9 +51,9 @@ class MemoTimelineBloc {
      });
 
      _updateMemoContensSubject.stream.listen((_) {
-       final displayMemos = _memoRepository.getMemos().asStream();
-       _displayMemosSubject.addStream(displayMemos);
-       print(_displayMemosSubject.value);
+       _memoRepository.getMemos().then((memos) {
+         _displayMemosSubject.add(memos);
+       });
      });
 
      final displayMemos = _memoRepository.getMemos().asStream();
@@ -63,6 +63,7 @@ class MemoTimelineBloc {
   void dispose() {
     _myFeaturesSubject.close();
     _displayMemosSubject.close();
+    _updateMemoContensSubject.close();
   }
 
 }
