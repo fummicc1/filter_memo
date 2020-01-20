@@ -15,29 +15,12 @@ class APIClient with MemoRepository {
 }
 
 class APIClientMock with MemoRepository {
-
-  final targets1 = [
-    "大学生",
-    "プログラミング",
-    "野球"
-  ];
-  final targets2 = [
-    "大学生",
-    "テニス",
-    "サッカー"
-  ];
-  final targets3 = [
-    "パート",
-    "水泳",
-    "メガネ"
-  ];
-
   @override
   Future<List<Memo>> getMemos() {
     return Future.value([
-      Memo(targets1, DateTime.now(), "テスト１"),
-      Memo(targets2, DateTime.now(), "テスト2"),
-      Memo(targets3, DateTime.now(), "テスト3"),
+      Memo(DateTime.now(), "テスト１"),
+      Memo(DateTime.now(), "テスト2"),
+      Memo(DateTime.now(), "テスト3"),
     ]);
   }
 
