@@ -1,4 +1,5 @@
 import 'package:filter_memo/bloc/create_memo_bloc.dart';
+import 'package:filter_memo/bloc/memo_list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,15 +18,7 @@ class CreateMemoPage extends StatelessWidget {
             );
           } else if (snapshot.data == CreateMemoStatus.Fail) {
           } else if (snapshot.data == CreateMemoStatus.Success) {
-            return Center(
-              child: FlatButton.icon(
-                icon: Icon(Icons.done),
-                label: Container(),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            );
+            Navigator.of(context).pop();
           }
 
           return Scaffold(
@@ -35,32 +28,22 @@ class CreateMemoPage extends StatelessWidget {
             body: SafeArea(
                 child: Column(
               children: <Widget>[
-                Positioned(
-                  top: 32,
-                  right: 16,
-                  left: 16,
-                  child: TextField(
-                    maxLength: 6,
-                    minLines: 1,
-                    decoration: InputDecoration(
-                      hintText: "メモ",
-                    ),
-                    onChanged: (text) {
-                      bloc.memoSink.add(text);
-                    },
+                TextField(
+                  maxLines: 6,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    hintText: "メモ",
                   ),
+                  onChanged: (text) {
+                    bloc.memoSink.add(text);
+                  },
                 ),
-                Positioned(
-                  bottom: 96,
-                  left: 64,
-                  right: 64,
-                  child: FlatButton.icon(
-                    icon: Icon(Icons.save),
-                    label: Text("完了"),
-                    onPressed: () {
-                      bloc.saveButtonSink.add(null);
-                    },
-                  ),
+                FlatButton.icon(
+                  icon: Icon(Icons.save),
+                  label: Text("完了"),
+                  onPressed: () {
+                    bloc.saveButtonSink.add(null);
+                  },
                 )
               ],
             )),

@@ -13,29 +13,21 @@ class _MemoListPageState extends State<MemoListPage> {
   Widget build(BuildContext context) {
     MemoListBloc bloc = Provider.of<MemoListBloc>(context);
 
+    final memoList = bloc.getMemo();
+
     return Scaffold(
       body: SafeArea(
-        child: StreamBuilder<List<Memo>>(
-            stream: bloc.memoStream,
-            initialData: [],
-            builder: (context, snapshot) {
-              if (snapshot.data.isEmpty) return Container();
-
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  return Material(
-                    elevation: 4,
-                    child: Card(
-                      child: ListTile(
-                        title: Text(snapshot.data[index].content),
-                      ),
-                    ),
-                  );
-                },
-              );
-            }),
-      ),
+          child: ListView.builder(
+        itemBuilder: (context, index) {
+          return Material(
+            child: Card(
+              child: ListTile(
+                title: Text(memoList[index].content),
+              ),
+            ),
+          );
+        },
+      )),
       floatingActionButton: Container(
         padding: EdgeInsets.only(right: 24, bottom: 32),
         child: FloatingActionButton(

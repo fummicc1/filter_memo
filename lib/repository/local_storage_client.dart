@@ -6,18 +6,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageClient with MemoRepository {
 
-  @override
-  Future<List<Memo>> getMemos() async {
+  SharedPreferences shared;
 
-    final shared = await SharedPreferences.getInstance();
+  LocalStorageClient() {
+    SharedPreferences.getInstance().then((shared) {
+      this.shared = shared;
+      getMemos();
+    });
+  }
+
+  @override
+  List<Memo> getMemos() {
+
+    if (shared == null) {
+      return [];
+    }
 
     final keys = shared.getKeys();
     if (!keys.contains("memo_list")) {
-      return Future.value([]);
+      return [];
     }
 
     final memosJsonData = shared.get("memo_list");
-    if (memosJsonData == null) return Future.value([]);
+    if (memosJsonData == null) return [];
 
     final List<dynamic> memosMap = json.decode(memosJsonData)["values"] as List<dynamic>;
 
@@ -27,7 +38,6 @@ class LocalStorageClient with MemoRepository {
       final Memo memo = Memo.fromJson(memosMap[i] as Map<String, dynamic>);
       memos.add(memo);
     }
-
     return memos;
   }
 
@@ -44,8 +54,8 @@ class LocalStorageClient with MemoRepository {
 class LocalStorageClientMock with MemoRepository {
 
   @override
-  Future<List<Memo>> getMemos() async {
-    return Future<List<Memo>>.delayed(Duration(milliseconds: 1), () => []);
+  List<Memo> getMemos() {
+    return [];
   }
 
   @override
